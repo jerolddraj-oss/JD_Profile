@@ -7,7 +7,7 @@ variable "secondary_region" {
 }
 
 variable "eks_version" {
-  default = "1.28"
+  default = "1.27"
 }
 
 variable "east_vpc_cidr" {
