@@ -28,12 +28,12 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: aws-eks-ha-project
+        working-directory: JD_Profile/aws-eks-ha-project
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: aws-eks-ha-project
+        working-directory: JD_Profile/aws-eks-ha-project
 
       - name: Terraform Plan
         run: terraform plan
-        working-directory: aws-eks-ha-project
+        working-directory: JD_Profile/aws-eks-ha-project
