@@ -12,10 +12,9 @@ module "eks" {
 
   enable_irsa = true
 
-  # Disable automatic KMS key creation and cluster encryption
-  # for PoC stability and to avoid IAM KMS permission dependencies.
-  create_kms_key                  = false
-  create_cluster_encryption_config = false
+  # Disable automatic KMS key creation for PoC stability.
+  # Cluster encryption configuration is intentionally omitted.
+  create_kms_key = false
 
   cluster_enabled_log_types = [
     "api",
