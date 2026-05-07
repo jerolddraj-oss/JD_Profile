@@ -16,12 +16,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "east" {
   }
 }
 
-resource "aws_ec2_transit_gateway_vpc_attachment" "west" {
-  subnet_ids         = var.west_subnets
-  transit_gateway_id = aws_ec2_transit_gateway.tgw.id
-  vpc_id             = var.west_vpc_id
-
-  tags = {
-    Name = "west-vpc-attachment"
-  }
-}
+# Cross-region Transit Gateway attachment removed for PoC stability.
+# AWS Transit Gateway is regional and requires inter-region peering
+# instead of direct VPC attachment across regions.
