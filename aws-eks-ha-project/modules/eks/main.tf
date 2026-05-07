@@ -12,9 +12,10 @@ module "eks" {
 
   enable_irsa = true
 
-  # Disable automatic KMS key creation for PoC stability.
-  # This avoids GitHub OIDC IAM permission issues during deployment.
-  create_kms_key = false
+  # Disable automatic KMS key creation and cluster encryption
+  # for PoC stability and to avoid IAM KMS permission dependencies.
+  create_kms_key                  = false
+  create_cluster_encryption_config = false
 
   cluster_enabled_log_types = [
     "api",
