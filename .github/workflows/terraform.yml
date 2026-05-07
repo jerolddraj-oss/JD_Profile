@@ -1,9 +1,18 @@
-name: Terraform Plan
+name: Terraform Operations
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: "Select Terraform Action"
+        required: true
+        type: choice
+        options:
+          - init
+          - validate
+          - plan
+          - apply
+          - destroy
 
 jobs:
   terraform:
@@ -12,6 +21,9 @@ jobs:
     permissions:
       id-token: write
       contents: read
+
+    env:
+      TF_WORKING_DIR: aws-eks-ha-project
 
     steps:
       - name: Checkout
@@ -27,13 +39,26 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
+        if: github.event.inputs.terraform_action == 'init' || github.event.inputs.terraform_action == 'validate' || github.event.inputs.terraform_action == 'plan' || github.event.inputs.terraform_action == 'apply' || github.event.inputs.terraform_action == 'destroy'
         run: terraform init
-        working-directory: aws-eks-ha-project
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Validate
+        if: github.event.inputs.terraform_action == 'validate'
         run: terraform validate
-        working-directory: aws-eks-ha-project
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Plan
+        if: github.event.inputs.terraform_action == 'plan'
         run: terraform plan
-        working-directory: aws-eks-ha-project
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Apply
+        if: github.event.inputs.terraform_action == 'apply'
+        run: terraform apply -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Terraform Destroy
+        if: github.event.inputs.terraform_action == 'destroy'
+        run: terraform destroy -auto-approve
+        working-directory: ${{ env.TF_WORKING_DIR }}
