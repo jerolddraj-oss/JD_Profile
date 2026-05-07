@@ -16,27 +16,47 @@ on:
 
 jobs:
   terraform:
+    name: AWS Multi-Region EKS Deployment
     runs-on: ubuntu-latest
 
     permissions:
       id-token: write
       contents: read
 
+    environment:
+      name: production
+
     env:
       TF_WORKING_DIR: aws-eks-ha-project
+      TF_IN_AUTOMATION: true
+      AWS_REGION: us-east-1
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: GitHubActionsTerraform
           aws-region: us-east-1
+
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
+
+      - name: Terraform Format Check
+        run: terraform fmt -recursive
+        working-directory: ${{ env.TF_WORKING_DIR }}
 
       - name: Terraform Init
         if: github.event.inputs.terraform_action == 'init' || github.event.inputs.terraform_action == 'validate' || github.event.inputs.terraform_action == 'plan' || github.event.inputs.terraform_action == 'apply' || github.event.inputs.terraform_action == 'destroy'
@@ -50,8 +70,15 @@ jobs:
 
       - name: Terraform Plan
         if: github.event.inputs.terraform_action == 'plan'
-        run: terraform plan
+        run: terraform plan -out=tfplan
         working-directory: ${{ env.TF_WORKING_DIR }}
+
+      - name: Upload Terraform Plan
+        if: github.event.inputs.terraform_action == 'plan'
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: aws-eks-ha-project/tfplan
 
       - name: Terraform Apply
         if: github.event.inputs.terraform_action == 'apply'
