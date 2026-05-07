@@ -26,6 +26,10 @@ module "east_eks" {
   vpc_id             = module.east_vpc.vpc_id
   subnet_ids         = module.east_vpc.private_subnets
   environment        = "prod-east"
+
+  depends_on = [
+    module.east_vpc
+  ]
 }
 
 module "west_eks" {
@@ -40,6 +44,10 @@ module "west_eks" {
   vpc_id             = module.west_vpc.vpc_id
   subnet_ids         = module.west_vpc.private_subnets
   environment        = "prod-west"
+
+  depends_on = [
+    module.west_vpc
+  ]
 }
 
 module "transit_gateway" {
@@ -50,4 +58,9 @@ module "transit_gateway" {
 
   east_subnets = module.east_vpc.private_subnets
   west_subnets = module.west_vpc.private_subnets
+
+  depends_on = [
+    module.east_vpc,
+    module.west_vpc
+  ]
 }
