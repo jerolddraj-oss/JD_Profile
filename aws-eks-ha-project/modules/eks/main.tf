@@ -33,6 +33,7 @@ module "eks" {
       max_size     = 4
 
       instance_types = ["t3.large"]
+      ami_type      = "AL2_x86_64"
 
       capacity_type = "ON_DEMAND"
     }
